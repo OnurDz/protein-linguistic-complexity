@@ -2,28 +2,11 @@
 `python3 -m pip install -p requirements.txt`
 
 ### Usage
+You should change the address in email.txt to yours. <br>
+"To make use of NCBI's E-utilities, NCBI requires you to specify your
+email address with each request. <br>
+In case of excessive usage of the E-utilities, NCBI will attempt to contact a user at the email address provided before blocking access to the E-utilities."
 
-#### Arguments
-#### `-f <file-name>`
-Use to give multiple RefSeq numbers listed in `<file-name>`. <br>
-Example RefSeq list file: <br>
-```
-NP_040831.1
-NP_000591.1
-NP_003451.1
-NP_103451.1
-NP_003001.1
-```
-
-#### `-p <refseq-number>`
-Use to give a single RefSeq number.
-
-
-#### Optional Arguments
-#### `--fasta-file <file-name>`
-Use to specify stored .fasta file name. <br>
-Stored .fasta file name will be the date-time of execution if a file name is not specified.
-
-#### `--output-file <file-name>`
-Use to specify an output file. <br>
-Results will be written only to terminal if an output file name is not specified.
+#### `calculate_lc <REFSEQ> -w <window-size>`
+-w argument is optional.<br>
+If you give a window size, program will run in a sliding window.

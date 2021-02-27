@@ -1,9 +1,10 @@
 import os
 from urllib.error import HTTPError
+import datetime
 
 from Bio import Entrez
 from Bio import SeqIO
-import datetime
+
 
 # To make use of NCBI's E-utilities, NCBI requires you to specify your
 # email address with each request.
@@ -12,31 +13,18 @@ import datetime
 email: str = open("email.txt", 'r').read()
 
 
-# Return FASTAs as a Python dictionary { refseq: sequence }
-# Stored .fasta file name will be the date-time of execution if a file name is not specified
-def fetch(refseq_list, file_name=str(datetime.datetime.now())):
+# Return FASTA as a Python dictionary { refseq: sequence }
+def fetch(refseq):
     Entrez.email = email
-
     try:
-        os.mkdir('./fasta')
-    except FileExistsError:
-        pass
-    if file_name[-6:] != '.fasta':
-        file_name = str(file_name + '.fasta')
-    fpath = str('fasta/' + file_name)
-    file = open(fpath, 'a')
-    file.truncate(0)
+        handle = Entrez.efetch(db="protein", id=refseq, rettype="fasta", retmode="text")
+    except HTTPError:
+        print("Bad RefSeq number: ", refseq, "\nPlease make sure your RefSeq number is correct.")
+        exit(-1)
 
-    for refseq in refseq_list:
-        try:
-            handle = Entrez.efetch(db="protein", id=refseq, rettype="fasta", retmode="text")
-        except HTTPError:
-            print("Bad RefSeq number: ", refseq, "\nPlease make sure your inputs are correct.")
-            exit(-1)
-        file.writelines(handle.read())
-    file.close()
-
-    fasta_iter = SeqIO.parse(fpath, "fasta")
-    fasta_dict = {record.name: record.seq for record in fasta_iter}
+    fasta_iter = SeqIO.parse(handle, "fasta")
+    #fasta_dict = {record.name: record.seq for record in fasta_iter}
+    for record in fasta_iter:
+        fasta_tuple = (record.name, record.seq)
     handle.close()
-    return fasta_dict
+    return fasta_tuple
