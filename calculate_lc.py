@@ -1,63 +1,63 @@
 import os
+from sys import argv
 
 import protein_lc
 import fasta_fetcher
-from sys import argv
+import plotter
 
 
 def main():
-    if '-f' in argv and '-p' in argv:
-        print("-f and -p should not be used at the same time even though it works.\n"
-              "Please consider either entering the name of a file containing RefSeq list following -f "
-              "or enter a single RefSeq number following -p\n"
-              "Duplicates are eliminated by default.")
-
-    refseq_list = []
-
-    if '-f' in argv:
-        try:
-            refseq_file = open(argv[argv.index('-f') + 1], 'r')
-        except FileNotFoundError:
-            print("Specified RefSeq file is not found. Please check your input.\nExiting.")
-            exit(-1)
-
-        for line in refseq_file.readlines():
-            if line.strip() not in refseq_list:
-                refseq_list.append(line.strip())
-
-        refseq_file.close()
-
-    if '-p' in argv:
-        refseq_list.append(argv[argv.index('-p') + 1])
-
-    if '--fasta-file' in argv:
-        file_name_ = argv[argv.index('--fasta-file') + 1]
-        fasta = fasta_fetcher.fetch(refseq_list, file_name=file_name_)
+    refseq: str = str(argv[1])
+    fasta = fasta_fetcher.fetch(refseq)
+    refseq = fasta[0]
+    seq_: str = fasta[1]
+    print("[INFO] RefSeq number:", refseq)
+    print("[INFO] Sequence size:", len(seq_), "amino-acids.")
+    if '-w' in argv:
+        window_size_: int = int(argv[argv.index('-w') + 1])
+        res: list = slide(seq_, window_size=window_size_)
+        plotter.comp_dist(res)
     else:
-        fasta = fasta_fetcher.fetch(refseq_list)
+        res: float = total(seq_)
+        print("Linguistic complexity of", refseq, ":", res)
 
-    lc_list = []
-    result = ""
-    for refseq in refseq_list:
-        lc_list.append(protein_lc.calculate(fasta[refseq]))
-    for i in range(len(lc_list)):
-        result = result + (str(refseq_list[i]) + " : " + str(lc_list[i]) + '\n')
 
-    if '--output-file' in argv:
-        try:
-            os.mkdir("./results")
-        except FileExistsError:
-            pass
+# Second main method I used to generate plots for the report.
+def plot_demo_main():
+    ws1 = 15
+    ws2 = 25
+    ws3 = 50
+    refseq: str = str(argv[1])
+    fasta = fasta_fetcher.fetch(refseq)
+    refseq = fasta[0]
+    seq_: str = fasta[1]
+    #print(seq_)
+    print("[INFO] RefSeq number:", refseq)
+    print("[INFO] Sequence size:", len(seq_), "amino-acids.")
+    print("[INFO] Window sizes:", ws1, ws2, ws3)
+    ws1_res = slide(seq_, window_size=ws1)
+    ws2_res = slide(seq_, window_size=ws2)
+    ws3_res = slide(seq_, window_size=ws3)
+    plotter.triple(ws1_res, ws2_res, ws3_res, ws1, ws2, ws3)
 
-        try:
-            output_file = open(str("results/" + argv[argv.index('--output-file') + 1]), 'w')
-            output_file.write(result)
-        except FileNotFoundError:
-            print("Specified output file is not found. Please check your input.\nExiting.")
-            pass
 
-    print(result)
+def slide(seq: str, window_size: int):
+    res: list = list()
+    for i in range(0, len(seq)):
+        if window_size > len(seq) - i:
+            window = seq[i:]
+            break
+        else:
+            window = seq[i:i + window_size]
+        res.append(protein_lc.calculate(window))
+    return res
+
+
+def total(seq: str):
+    comp = protein_lc.calculate(seq)
+    return comp
 
 
 if __name__ == '__main__':
     main()
+    #plot_demo_main()
