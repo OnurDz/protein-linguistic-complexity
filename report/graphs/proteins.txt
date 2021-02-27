@@ -1,0 +1,16 @@
+DEFINITION  reelin isoform a precursor [Homo sapiens].
+ACCESSION   NP_005036
+
+DEFINITION  microtubule-associated protein tau isoform 6 [Homo sapiens].
+ACCESSION   NP_001116538
+
+DEFINITION  amyloid-beta precursor protein isoform a precursor [Homo sapiens].
+ACCESSION   NP_000475
+
+DEFINITION  brain-derived neurotrophic factor isoform a preproprotein [Homo
+            sapiens].
+ACCESSION   NP_001137277
+
+DEFINITION  beta-nerve growth factor precursor [Homo sapiens].
+ACCESSION   NP_002497
+
